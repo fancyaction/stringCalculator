@@ -51,7 +51,7 @@ describe('Calculation supports inputs with default delimiters', () => {
 
     it('Returns error containing array of negative numbers', () => {
         try {
-            new Calculation(delimiter, '-3,-6,-11').getTotal();
+            new Calculation(delimiter, '-3,-6,-11', 1000, true).getTotal();
         } catch (e) {
             expect(e.message).toBe('These negative inputs are not allowed: -3,-6,-11');
         }
