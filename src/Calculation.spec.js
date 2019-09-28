@@ -16,7 +16,7 @@ describe('Calculation supports a maximum of 2 numbers using a comma delimiter', 
         expect(calculationTotal).toBe(20);
     })
     it('Combines two inputs', () => {
-        const calculationTotal = new Calculation(delimiter, '1,5000').getTotal();
+        const calculationTotal = new Calculation(delimiter, '1,5000', 5000).getTotal();
 
         expect(calculationTotal).toBe(5001);
     })
@@ -51,5 +51,11 @@ describe('Calculation supports a maximum of 2 numbers using a comma delimiter', 
         } catch (e) {
             expect(e.message).toBe('These negative inputs are not allowed: -3,-6,-11');
         }
+    })
+
+    it('Ignores any number greater than 1000', () => {
+        const calculationTotal = new Calculation(delimiter, '2,1001,6').getTotal();
+
+        expect(calculationTotal).toBe(8);
     })
 })

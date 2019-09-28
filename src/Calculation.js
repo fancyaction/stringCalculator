@@ -1,10 +1,11 @@
 export default class Calculation {
-    constructor(delimiter, inputValue) {
+    constructor(delimiter, inputValue, maxValue = 1000) {
         this.delimiter = delimiter;
         this.inputValue = inputValue;
+        this.maxValue = maxValue;
     }
 
-    getNumber = value => Number.isNaN(parseInt(value)) ? 0 : parseInt(value);
+    getNumber = value => Number.isNaN(parseInt(value)) ||  parseInt(value) > this.maxValue ? 0 : parseInt(value);
 
     validateInput = inputs => {
         const invalidNumbers = inputs.filter(val => -1 === Math.sign(val));
