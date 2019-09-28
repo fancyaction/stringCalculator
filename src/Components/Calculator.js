@@ -22,6 +22,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
+export const getSplitInputs = input => input.split('\n');
 
 const Calculator = () => {
     const classes = useStyles();
