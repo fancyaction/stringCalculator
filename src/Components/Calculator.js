@@ -21,26 +21,36 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
+export const getSplitInputs = input => input.split('\\n');
 
-export const getSplitInputs = input => input.split('\n');
+export const defaultDelimiters = '[,]'
 
 const Calculator = () => {
     const classes = useStyles();
     const [total, setTotal] = React.useState({
         input: '',
-        delimitter: '',
+        delimiter: '',
         value: 0
       });
 
     const handleTotal = ev => {
-        let input = ev.target.value;
-        const defaultDelimiters = [',', '\\n']
-        const delimiter = new Delimiter(defaultDelimiters);
-        console.log('👀: Calculator -> delimiter', delimiter);
-        const regex = delimiter.getRegex();
-        console.log('👀: Calculator -> regex', regex);
+        const input = ev.target.value;
+        const hasCustomDelimiter = /\\n/.test(input);
+        let delimiter = null;
+        let value = 0;
+        
+        if (hasCustomDelimiter) {
+            let [customDelimiter, values] = getSplitInputs(input);
+            delimiter = new Delimiter(defaultDelimiters, customDelimiter).getRegex();
+            value = new Calculation(delimiter, values).getTotal();
 
-        setTotal({input, delimitter: '/,|\\n/', value: 25});
+            return setTotal({input, delimiter, value});
+        }
+
+        delimiter = new Delimiter(defaultDelimiters).getRegex();
+        value = new Calculation(delimiter, input).getTotal();
+
+        setTotal({input, delimiter, value});
       };
 
     return (
