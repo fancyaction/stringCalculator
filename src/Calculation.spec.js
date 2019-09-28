@@ -2,7 +2,8 @@ import Calculation from './Calculation';
 import { getSplitInputs } from './Components/Calculator';
 import Delimiter from './Delimiter';
 
-const defaultDelimiters = [',', '\\n']
+// const defaultDelimiters = [',', '\\n']
+const defaultDelimiters = '[,]'
 
 describe('Calculation supports inputs with default delimiters', () => {
     let delimiter;
@@ -42,6 +43,7 @@ describe('Calculation supports inputs with default delimiters', () => {
     })
 
     it('Supports newline character as an alternative delimiter', () => {
+        const delimiter = new Delimiter(defaultDelimiters, '\n').getRegex();
         const calculationTotal = new Calculation(delimiter, '1\n2,3').getTotal();
 
         expect(calculationTotal).toBe(6);
@@ -66,7 +68,7 @@ describe('Calculation supports inputs with custom delimiters', () => {
     it('Supports custom single character length delimiter', () => {
         const [customDelimiter, values] = getSplitInputs('//;\n2;5');
 
-        const delimiter = new Delimiter([...defaultDelimiters, customDelimiter]).getRegex();
+        const delimiter = new Delimiter(defaultDelimiters, customDelimiter).getRegex();
         const calculationTotal = new Calculation(delimiter, values).getTotal();
 
         expect(calculationTotal).toBe(7);
@@ -75,7 +77,7 @@ describe('Calculation supports inputs with custom delimiters', () => {
     it('Supports custom delimiter of any length', () => {
         const [customDelimiter, values] = getSplitInputs('//[***]\n11***22***33');
 
-        const delimiter = new Delimiter([...defaultDelimiters, customDelimiter]).getRegex();
+        const delimiter = new Delimiter(defaultDelimiters, customDelimiter).getRegex();
         const calculationTotal = new Calculation(delimiter, values).getTotal();
 
         expect(calculationTotal).toBe(66);
@@ -84,7 +86,7 @@ describe('Calculation supports inputs with custom delimiters', () => {
     it('Support multiple delimiter of any length', () => {
         const [customDelimiter, values] = getSplitInputs('//[*][!!][r9r]\n11r9r22*33!!44');
 
-        const delimiter = new Delimiter([...defaultDelimiters, customDelimiter]).getRegex();
+        const delimiter = new Delimiter(defaultDelimiters, customDelimiter).getRegex();
         const calculationTotal = new Calculation(delimiter, values).getTotal();
 
         expect(calculationTotal).toBe(110);
