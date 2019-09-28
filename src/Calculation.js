@@ -16,12 +16,32 @@ export default class Calculation {
         }
     }
 
-    getTotal = () => {
+    getTotal = (type = 'add') => {
         const { inputValue, delimiter } = this;
         const inputsArr = inputValue.split(delimiter);
-
+        let total = 0;
+        
         this.validateInput(inputsArr);
-        return inputsArr.reduce((prev, curr) => prev + this.getNumber(curr), 0);
+
+        switch (type) {
+            case 'add':
+                total = inputsArr.reduce((prev, curr) => prev + this.getNumber(curr), 0);
+                break;
+
+            case 'subtract':
+                total = inputsArr.reduce((prev, curr) => prev - this.getNumber(curr), 0);
+                break;
+
+            case 'multiply':
+                total = inputsArr.reduce((prev, curr) => prev * this.getNumber(curr), 1);
+                break;
+        
+            default:
+                total = inputsArr.reduce((prev, curr) => prev / this.getNumber(curr), 1);
+                break;
+        }
+
+        return total;
     }
 
 }
