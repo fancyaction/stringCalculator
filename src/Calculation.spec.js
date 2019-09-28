@@ -1,9 +1,10 @@
 import Calculation from './Calculation';
+import { getSplitInputs } from './Components/Calculator';
 import Delimiter from './Delimiter';
 
 const defaultDelimiters = [',', '\\n']
 
-describe('Calculation supports a maximum of 2 numbers using a comma delimiter', () => {
+describe('Calculation supports inputs with default delimiters', () => {
     let delimiter;
 
     beforeEach(() => {
@@ -15,6 +16,7 @@ describe('Calculation supports a maximum of 2 numbers using a comma delimiter', 
 
         expect(calculationTotal).toBe(20);
     })
+
     it('Combines two inputs', () => {
         const calculationTotal = new Calculation(delimiter, '1,5000', 5000).getTotal();
 
@@ -26,7 +28,7 @@ describe('Calculation supports a maximum of 2 numbers using a comma delimiter', 
 
         expect(calculationTotal).toBe(0);
     })
-    
+
     it('Combines invalid and valid inputs', () => {
         const calculationTotal = new Calculation(delimiter, '5,tytyt').getTotal();
 
@@ -38,7 +40,7 @@ describe('Calculation supports a maximum of 2 numbers using a comma delimiter', 
 
         expect(calculationTotal).toBe(78);
     })
-    
+
     it('Supports newline character as an alternative delimiter', () => {
         const calculationTotal = new Calculation(delimiter, '1\n2,3').getTotal();
 
@@ -59,3 +61,32 @@ describe('Calculation supports a maximum of 2 numbers using a comma delimiter', 
         expect(calculationTotal).toBe(8);
     })
 })
+
+describe('Calculation supports inputs with custom delimiters', () => {
+    it('Supports custom single character length delimiter', () => {
+        const [customDelimiter, values] = getSplitInputs('//;\n2;5');
+
+        const delimiter = new Delimiter([...defaultDelimiters, customDelimiter]).getRegex();
+        const calculationTotal = new Calculation(delimiter, values).getTotal();
+
+        expect(calculationTotal).toBe(7);
+    })
+
+    it('Supports custom delimiter of any length', () => {
+        const [customDelimiter, values] = getSplitInputs('//[***]\n11***22***33');
+
+        const delimiter = new Delimiter([...defaultDelimiters, customDelimiter]).getRegex();
+        const calculationTotal = new Calculation(delimiter, values).getTotal();
+
+        expect(calculationTotal).toBe(66);
+    })
+
+    it('Support multiple delimiter of any length', () => {
+        const [customDelimiter, values] = getSplitInputs('//[*][!!][r9r]\n11r9r22*33!!44');
+
+        const delimiter = new Delimiter([...defaultDelimiters, customDelimiter]).getRegex();
+        const calculationTotal = new Calculation(delimiter, values).getTotal();
+
+        expect(calculationTotal).toBe(110);
+    })
+});
