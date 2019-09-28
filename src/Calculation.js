@@ -1,9 +1,18 @@
-export default class {
-    constructor(delimiter, data) {
+export default class Calculation {
+    constructor(delimiter, inputValue) {
         this.delimiter = delimiter;
-        this.data = data;
+        this.inputValue = inputValue;
     }
 
-    getTotal = () => console.log(this.delimiter)
-    
+    getNumber = value => Number.isNaN(parseInt(value)) ? 0 : parseInt(value);
+
+    getTotal = () => {
+        const { inputValue, delimiter } = this;
+
+        const inputsArr = inputValue.split(delimiter);
+
+        return inputsArr.reduce((prev, curr) => prev + this.getNumber(curr), 0);
+
+    }
+
 }
