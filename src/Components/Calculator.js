@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Container, Paper, TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import Display from './Display';
 import Header from './Header'
+import Calculation from '../Calculation';
+import Delimiter from '../Delimiter';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -19,19 +21,38 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
+
+
 const Calculator = () => {
     const classes = useStyles();
+    const [total, setTotal] = React.useState({
+        input: '',
+        delimitter: '',
+        value: 0
+      });
+
+    const handleTotal = ev => {
+        let input = ev.target.value;
+        const defaultDelimiters = [',', '\\n']
+        const delimiter = new Delimiter(defaultDelimiters);
+        console.log('👀: Calculator -> delimiter', delimiter);
+        const regex = delimiter.getRegex();
+        console.log('👀: Calculator -> regex', regex);
+
+        setTotal({input, delimitter: '/,|\\n/', value: 25});
+      };
+
     return (
         <Container maxWidth="sm">
             <Paper className={classes.root}>
                 <Header />
-                <Display total={25} />
+                <Display total={total.value} />
                 <TextField
                     id="input"
                     label="Input"
                     className={classes.textField}
-                    // value={values.name}
-                    onChange={ev => console.log(ev.target.value)}
+                    value={total.input}
+                    onChange={handleTotal}
                     margin="normal"
                 />
             </Paper>
