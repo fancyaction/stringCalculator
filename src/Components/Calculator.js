@@ -25,39 +25,58 @@ export const getSplitInputs = input => input.split('\\n');
 
 export const defaultDelimiters = '[,]'
 
+const DEFAULT_MAX_VALUE = 1000;
+
 const Calculator = () => {
     const classes = useStyles();
+    const [max, setMax] = React.useState(DEFAULT_MAX_VALUE);
     const [total, setTotal] = React.useState({
         input: '',
         delimiter: '',
         value: 0
-      });
+    });
 
     const handleTotal = ev => {
         const input = ev.target.value;
         const hasCustomDelimiter = /\\n/.test(input);
         let delimiter = null;
         let value = 0;
-        
+
         if (hasCustomDelimiter) {
             let [customDelimiter, values] = getSplitInputs(input);
             delimiter = new Delimiter(defaultDelimiters, customDelimiter).getRegex();
-            value = new Calculation(delimiter, values).getTotal();
+            value = new Calculation(delimiter, values, max).getTotal();
 
-            return setTotal({input, delimiter, value});
+            return setTotal({ input, delimiter, value });
         }
 
         delimiter = new Delimiter(defaultDelimiters).getRegex();
-        value = new Calculation(delimiter, input).getTotal();
+        value = new Calculation(delimiter, input, max).getTotal();
 
-        setTotal({input, delimiter, value});
-      };
+        setTotal({ input, delimiter, value });
+    };
+
+    const handleMaxChange = ev => {
+        const newMax = ev.target.value;
+        const value = new Calculation(total.delimiter, total.input, newMax).getTotal();
+
+        setMax(newMax);
+        setTotal({ ...total, value });
+    }
 
     return (
         <Container maxWidth="sm">
             <Paper className={classes.root}>
                 <Header />
                 <Display total={total.value} />
+                <TextField
+                    type="number"
+                    id="maxInput"
+                    label="Max Allowed"
+                    value={max}
+                    onChange={handleMaxChange}
+                    margin="normal"
+                />
                 <TextField
                     id="input"
                     label="Input"
