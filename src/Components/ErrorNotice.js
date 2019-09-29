@@ -21,7 +21,7 @@ const ErrorNotice = ({ text, show, onClose }) => {
                     horizontal: 'center',
                 }}
                 open={show}
-                autoHideDuration={2500}
+                autoHideDuration={4500}
                 onClose={onClose}
                 ContentProps={{
                     'aria-describedby': 'message-id',
