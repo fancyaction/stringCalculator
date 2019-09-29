@@ -23,6 +23,8 @@ const useStyles = makeStyles(theme => ({
 
 export const getSplitInputs = input => input.split('\\n');
 
+const formatDelimiter = delimiter => delimiter.replace('\\', "").split('|');
+
 export const defaultDelimiters = '[,]'
 
 const DEFAULT_MAX_VALUE = 1000;
@@ -47,13 +49,13 @@ const Calculator = () => {
             delimiter = new Delimiter(defaultDelimiters, customDelimiter).getRegex();
             value = new Calculation(delimiter, values, max).getTotal();
 
-            return setTotal({ input, delimiter, value });
+            return setTotal({ input, delimiter: formatDelimiter(delimiter.source), value });
         }
 
         delimiter = new Delimiter(defaultDelimiters).getRegex();
         value = new Calculation(delimiter, input, max).getTotal();
 
-        setTotal({ input, delimiter, value });
+        setTotal({ input, delimiter: formatDelimiter(delimiter.source), value });
     };
 
     const handleMaxChange = ev => {
@@ -68,7 +70,7 @@ const Calculator = () => {
         <Container maxWidth="sm">
             <Paper className={classes.root}>
                 <Header />
-                <Display total={total.value} />
+                <Display total={total.value} delimiter={total.delimiter} />
                 <TextField
                     type="number"
                     id="maxInput"
