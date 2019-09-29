@@ -6,6 +6,8 @@ import Header from './Header'
 import Calculation from '../Calculation';
 import Delimiter from '../Delimiter';
 import CalcButtons from './CalcButtons';
+import CalcOptions from './CalcOptions';
+import ErrorNotice from './ErrorNotice';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -34,7 +36,16 @@ const DEFAULT_CALC_TYPE = 'add';
 const Calculator = () => {
     const classes = useStyles();
     const [max, setMax] = React.useState(DEFAULT_MAX_VALUE);
+    const [error, setError] = React.useState({
+        show: false,
+        message: ''
+    });
+    const [negatives, setNegatives] = React.useState(DEFAULT_ALLOW_NEGATIVES);
     const [calcType, setCalcType] = React.useState(DEFAULT_CALC_TYPE);
+    const [formula, setFormula] = React.useState({
+        show: DEFAULT_SHOW_FORMULA,
+        value: ''
+    });
     const [total, setTotal] = React.useState({
         input: '',
         delimiter: '',
@@ -78,6 +89,7 @@ const Calculator = () => {
 
     return (
         <Container maxWidth="sm">
+            <ErrorNotice text={error.message} show={error.show} onClose={() => setError({ show: false, message: '' })} />
             <Paper className={classes.root}>
                 <Header />
                 <CalcButtons handleCalcButtonClick={handleCalcButtonClick} calcType={calcType} />
@@ -97,6 +109,12 @@ const Calculator = () => {
                     value={total.input}
                     onChange={handleTotal}
                     margin="normal"
+                />
+                <CalcOptions
+                    showFormula={formula.show}
+                    toggleFormula={ev => setFormula({ ...formula, show: !formula.show })}
+                    allowNegatives={negatives}
+                    toggleNegatives={handleNegativesUpdate}
                 />
             </Paper>
         </Container>
