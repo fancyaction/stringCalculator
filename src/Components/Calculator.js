@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Container, Paper, TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import Display from './Display';
 import Header from './Header'
 import Calculation from '../Calculation';
 import Delimiter from '../Delimiter';
+import CalcButtons from './CalcButtons';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -28,10 +29,12 @@ const formatDelimiter = delimiter => delimiter.replace('\\', "").split('|');
 export const defaultDelimiters = '[,]'
 
 const DEFAULT_MAX_VALUE = 1000;
+const DEFAULT_CALC_TYPE = 'add';
 
 const Calculator = () => {
     const classes = useStyles();
     const [max, setMax] = React.useState(DEFAULT_MAX_VALUE);
+    const [calcType, setCalcType] = React.useState(DEFAULT_CALC_TYPE);
     const [total, setTotal] = React.useState({
         input: '',
         delimiter: '',
@@ -47,29 +50,37 @@ const Calculator = () => {
         if (hasCustomDelimiter) {
             let [customDelimiter, values] = getSplitInputs(input);
             delimiter = new Delimiter(defaultDelimiters, customDelimiter).getRegex();
-            value = new Calculation(delimiter, values, max).getTotal();
+            value = new Calculation(delimiter, values, max).getTotal(calcType);
 
             return setTotal({ input, delimiter: formatDelimiter(delimiter.source), value });
         }
 
         delimiter = new Delimiter(defaultDelimiters).getRegex();
-        value = new Calculation(delimiter, input, max).getTotal();
+        value = new Calculation(delimiter, input, max).getTotal(calcType);
 
         setTotal({ input, delimiter: formatDelimiter(delimiter.source), value });
     };
 
     const handleMaxChange = ev => {
         const newMax = ev.target.value;
-        const value = new Calculation(total.delimiter, total.input, newMax).getTotal();
+        const value = new Calculation(total.delimiter, total.input, newMax).getTotal(calcType);
 
         setMax(newMax);
         setTotal({ ...total, value });
     }
 
+    const handleCalcButtonClick = type => ev => {
+        const value = new Calculation(total.delimiter, total.input, max).getTotal(type);
+
+        setCalcType(type);
+        setTotal({ ...total, value });
+    };
+
     return (
         <Container maxWidth="sm">
             <Paper className={classes.root}>
                 <Header />
+                <CalcButtons handleCalcButtonClick={handleCalcButtonClick} calcType={calcType} />
                 <Display total={total.value} delimiter={total.delimiter} />
                 <TextField
                     type="number"
