@@ -32,9 +32,12 @@ export const defaultDelimiters = '[,]'
 
 const DEFAULT_MAX_VALUE = 1000;
 const DEFAULT_CALC_TYPE = 'add';
+const DEFAULT_SHOW_FORMULA = true;
+const DEFAULT_ALLOW_NEGATIVES = false;
 
 const Calculator = () => {
     const classes = useStyles();
+
     const [max, setMax] = React.useState(DEFAULT_MAX_VALUE);
     const [error, setError] = React.useState({
         show: false,
@@ -52,40 +55,62 @@ const Calculator = () => {
         value: 0
     });
 
-    const handleTotal = ev => {
-        const input = ev.target.value;
-        const hasCustomDelimiter = /\\n/.test(input);
-        let delimiter = null;
-        let value = 0;
+    const getInputData = ({ valueInput = total.input, maxInput = max, negativesInput = negatives, type = calcType }) => {
+        const hasCustomDelimiter = /\\n/.test(valueInput);
+        let delimiter;
+        let newCalc;
+        let value;
 
         if (hasCustomDelimiter) {
-            let [customDelimiter, values] = getSplitInputs(input);
+            let [customDelimiter, values] = getSplitInputs(valueInput);
             delimiter = new Delimiter(defaultDelimiters, customDelimiter).getRegex();
-            value = new Calculation(delimiter, values, max).getTotal(calcType);
-
-            return setTotal({ input, delimiter: formatDelimiter(delimiter.source), value });
+            newCalc = new Calculation(delimiter, values, maxInput, negativesInput);
+        } else {
+            delimiter = new Delimiter(defaultDelimiters).getRegex();
+            newCalc = new Calculation(delimiter, valueInput, maxInput, negativesInput);
         }
 
-        delimiter = new Delimiter(defaultDelimiters).getRegex();
-        value = new Calculation(delimiter, input, max).getTotal(calcType);
+        try {
+            value = newCalc.getTotal(type);
+        } catch (err) {
+            setError({ show: true, message: err.message })
+        }
 
-        setTotal({ input, delimiter: formatDelimiter(delimiter.source), value });
+        if (formula.show) {
+            setFormula({ ...formula, value: newCalc.getFormula(type) })
+        }
+
+        return { value, delimiter: formatDelimiter(delimiter.source) }
+    };
+
+    const handleTotal = ev => {
+        const input = ev.target.value;
+        const { value, delimiter } = getInputData({valueInput: input});
+
+        setTotal({ input, delimiter, value });
     };
 
     const handleMaxChange = ev => {
         const newMax = ev.target.value;
-        const value = new Calculation(total.delimiter, total.input, newMax).getTotal(calcType);
+        const { value } = getInputData({ maxInput: newMax });
 
         setMax(newMax);
         setTotal({ ...total, value });
     }
 
     const handleCalcButtonClick = type => ev => {
-        const value = new Calculation(total.delimiter, total.input, max).getTotal(type);
+        const { value } = getInputData({ type });
 
         setCalcType(type);
         setTotal({ ...total, value });
     };
+
+    const handleNegativesUpdate = ev => {
+        const { value } = getInputData({ negativesInput: !negatives });
+
+        setNegatives(!negatives);
+        setTotal({ ...total, value });
+    }
 
     return (
         <Container maxWidth="sm">
@@ -106,6 +131,7 @@ const Calculator = () => {
                     id="input"
                     label="Input"
                     className={classes.textField}
+                    helperText={formula.show ? formula.value : ''}
                     value={total.input}
                     onChange={handleTotal}
                     margin="normal"
